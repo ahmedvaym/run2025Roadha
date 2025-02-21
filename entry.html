@@ -148,12 +148,12 @@ h1 {
       
       <div class="form-group">
         <label for="distance">Running Distance (km):</label>
-        <input type="number" id="distance" placeholder="Enter distance" required>
+        <input type="number" id="distance" placeholder="Enter distance" step="0.01" required>
       </div>
       
       <div class="form-group">
         <label for="pace">Running Pace (min/km):</label>
-        <input type="number" id="pace" placeholder="Enter pace" required>
+        <input type="number" id="pace" placeholder="Enter pace" step="0.01" required>
       </div>
       
       <button type="submit">Add</button>
@@ -171,7 +171,7 @@ h1 {
       apiKey: "AIzaSyClxIK0xiQh4XGZTgYuRHqq5xNT7iIGYjw",
       authDomain: "runninglog-f16f7.firebaseapp.com",
       projectId: "runninglog-f16f7",
-      storageBucket: "runninglog-f16f7.firebasestorage.app",
+      storageBucket: "runninglog-f16f7.appspot.com",
       messagingSenderId: "143536384226",
       appId: "1:143536384226:web:d35c56b74cfd62dc06d6bb",
       measurementId: "G-2Z7W4TFCZ4"
@@ -188,10 +188,10 @@ h1 {
       const date = document.getElementById('date').value;
       const name = document.getElementById('name').value;
       const contact = document.getElementById('contact').value;
-      const distance = document.getElementById('distance').value;
-      const pace = document.getElementById('pace').value;
+      const distance = parseFloat(document.getElementById('distance').value); // Parse as float
+      const pace = parseFloat(document.getElementById('pace').value); // Parse as float
 
-      if (date && name && contact && distance && pace) {
+      if (date && name && contact && !isNaN(distance) && !isNaN(pace)) {
         // Save data to Firebase as "pending"
         const runningLogRef = ref(database, 'runningLogs');
         const newEntry = push(runningLogRef);
@@ -199,13 +199,16 @@ h1 {
           date: new Date(date).toLocaleString(),
           name: name,
           contact: contact,
-          distance: distance,
-          pace: pace,
+          distance: distance, // Decimal value
+          pace: pace, // Decimal value
           status: "pending" // Status added as "pending"
         });
 
         // Clear form fields
         document.getElementById('runningForm').reset();
+        alert("Data saved successfully!");
+      } else {
+        alert("Please fill in all fields correctly.");
       }
     });
   </script>
