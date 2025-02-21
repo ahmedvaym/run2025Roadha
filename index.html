@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Challenge Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Add your header content here if needed -->
+        </div>
+        
+        <div class="buttons">
+            <button class="button" onclick="loadContent('register.html')">Register Form</button>
+            <button class="button" onclick="loadContent('entry.html')">Daily Running Entry</button>
+            <button class="button" onclick="loadContent('filter.html')">Running Log</button>
+        </div>
+        
+        <iframe id="iframeContent" src="" style="display: none;"></iframe>
+    </div>
+
+    <script>
+        function loadContent(page) {
+            const iframe = document.getElementById('iframeContent');
+            iframe.style.display = 'block'; // Show the iframe
+            iframe.src = page; // Set the src to the HTML file you want to open
+        }
+    </script>
+</body>
+</html>
