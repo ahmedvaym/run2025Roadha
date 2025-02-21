@@ -189,8 +189,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2em;
-    color: gold;
-    animation: medalAnimation 2s ease-in-out;
+    color: rgb(35, 3, 5);
+    animation: medalAnimation 4s ease-in-out;
     z-index: 1000;
   }
 
