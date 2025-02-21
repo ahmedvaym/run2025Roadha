@@ -1,11 +1,5 @@
   /* Load Faruma Font */
-  @font-face {
-    font-family: 'Faruma';
-    src: url('path-to-faruma-font.woff2') format('woff2'), /* Replace with the correct path */
-         url('path-to-faruma-font.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
+ 
   /* General Styles */
   body {
           font-family: 'Arial', sans-serif;
@@ -39,6 +33,16 @@
           /* Animation for zoom effect */
           animation: zoomInOut 10s infinite ease-in-out;
       }
+       /* Load Faruma font */
+       @import url('https://fonts.googleapis.com/css2?family=Faruma&display=swap');
+
+       h1 {
+           font-size: 2rem;
+           margin-bottom: 20px;
+           text-align: center;
+           color: #333;
+           font-family: 'Faruma', sans-serif; /* Apply Faruma font */
+       }
 
       /* Zoom-in and zoom-out animation */
       @keyframes zoomInOut {
