@@ -57,7 +57,7 @@
         }
 
         .button {
-            padding: 1px 2px;
+            padding: 5px 2px;
             font-size: 1.2rem;
             background-color: #564cc0;
             color: white;
@@ -79,7 +79,7 @@
             transform: translateY(0);
         }
 
-        /* Test button styling */
+        /* Screenshot button styling */
         .test-button {
             padding: 5px 10px; /* Smaller padding */
             font-size: 1rem; /* Smaller font size */
@@ -147,8 +147,8 @@
         <!-- Logo on the right side -->
         <img src="LOGO JERSY.png" alt="Logo" class="logo" id="logo">
 
-        <!-- Test button below the logo -->
-        <button class="test-button" id="testButton" onclick="loadContent('test.html')">Test</button>
+        <!-- Screenshot button below the logo -->
+        <button class="test-button" id="testButton" onclick="loadContent('image.html')">Screenshot</button>
 
         <div class="header">
           
@@ -191,10 +191,10 @@
             iframe.src = page;
         }
 
-        // Function to hide the Test button
+        // Function to hide the Screenshot button
         function hideTestButton() {
             const testButton = document.getElementById('testButton');
-            testButton.style.display = 'none'; // Hide the Test button
+            testButton.style.display = 'none'; // Hide the Screenshot button
         }
 
         // Function to save image and text to Firebase
