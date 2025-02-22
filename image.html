@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Saved Data</title>
     <style>
-        /* Body styling */
+        /* Body styling with background image */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-image: url('https://via.placeholder.com/1920x1080'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,11 +21,12 @@
             min-height: 100vh;
         }
 
-        /* Header styling */
-        h1 {
-            font-size: 2.5rem;
-            color: #333;
+        /* Top section styling */
+        .top-section {
+            width: 90%;
+            max-width: 1200px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         /* Filter select styling */
@@ -33,6 +37,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
         }
 
         /* Gallery styling */
@@ -46,7 +51,7 @@
         }
 
         .gallery-item {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -121,16 +126,78 @@
         .action-buttons button:hover {
             background-color: #cc0000;
         }
+
+        /* Modal overlay styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .close-button:hover {
+            background-color: #cc0000;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
 </head>
 <body>
-    <h1>Saved Data Gallery</h1>
-    <select id="filterSelect">
-        <option value="">Select an image name</option>
-    </select>
+    <div class="top-section">
+        <select id="filterSelect">
+            <option value="">Select an image name</option>
+        </select>
+    </div>
     <div class="gallery" id="gallery"></div>
+
+    <!-- Modal overlay for image preview -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Preview">
+            <button class="close-button" id="closeButton">&times;</button>
+        </div>
+    </div>
 
     <script>
         // Firebase configuration
@@ -209,10 +276,10 @@
 
                     // Handle gallery item click
                     galleryItem.addEventListener('click', () => {
-                        document.querySelectorAll('.gallery-item').forEach((item) => {
-                            item.classList.remove('selected');
-                        });
-                        galleryItem.classList.add('selected');
+                        const modalOverlay = document.getElementById('modalOverlay');
+                        const modalImage = document.getElementById('modalImage');
+                        modalImage.src = data.image;
+                        modalOverlay.classList.add('active');
                     });
 
                     gallery.appendChild(galleryItem);
@@ -240,6 +307,20 @@
                 });
             } else {
                 gallery.innerHTML = '<p>No data saved yet.</p>';
+            }
+        });
+
+        // Close modal functionality
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeButton = document.getElementById('closeButton');
+
+        closeButton.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
             }
         });
     </script>
