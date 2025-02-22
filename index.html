@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Running Challenge Dashboard</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         /* Body styling with animated background */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('6184000488555530013.jpg'); /* Replace with your new image path */
+            background-image: url('6184000488555530013.jpg'); /* Replace with your image path */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            animation: backgroundAnimation 10s infinite alternate; /* Background animation */
+            animation: backgroundAnimation 10s infinite alternate;
         }
-
-        /* Background opacity animation */
-       
 
         /* Container styling */
         .container {
@@ -29,7 +25,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: rgba(255, 255, 255, 0.5); /* Manually adjust opacity here (0.5 for 50% opacity) */
+            background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white background */
             position: relative;
         }
 
@@ -56,12 +52,12 @@
             gap: 20px;
             justify-content: center;
             margin-top: 30px;
-            position: relative; /* Ensure buttons are positioned relative to their container */
-            z-index: 2; /* Higher z-index to ensure buttons are in front of the logo */
+            position: relative;
+            z-index: 2;
         }
 
         .button {
-            padding: 5px 9px;
+            padding: 1px 2px;
             font-size: 1.2rem;
             background-color: #564cc0;
             color: white;
@@ -74,13 +70,41 @@
 
         .button:hover {
             background-color: #0056b3;
-            transform: translateY(-2px); /* Slight lift effect */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
         .button:active {
             background-color: #003f7f;
-            transform: translateY(0); /* Reset lift effect when clicked */
+            transform: translateY(0);
+        }
+
+        /* Test button styling */
+        .test-button {
+            padding: 5px 10px; /* Smaller padding */
+            font-size: 1rem; /* Smaller font size */
+            background-color: #2c3e50; /* Dark blue/grey color */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: absolute; /* Position absolutely */
+            top: 180px; /* Position below the logo */
+            right: 20px; /* Position on the right side */
+            z-index: 1; /* Ensure it's above other elements */
+        }
+
+        .test-button:hover {
+            background-color: #34495e; /* Slightly lighter dark blue/grey on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-button:active {
+            background-color: #1c2833; /* Darker shade on active */
+            transform: translateY(0);
         }
 
         /* Iframe styling */
@@ -91,8 +115,8 @@
             margin-top: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            position: relative; /* Ensure iframe is positioned relative to its container */
-            z-index: 2; /* Higher z-index to ensure iframe is in front of the logo */
+            position: relative;
+            z-index: 2;
         }
 
         /* Logo styling */
@@ -100,48 +124,117 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 150px; /* Medium size */
+            width: 150px;
             height: auto;
-            animation: zoomInOut 3s infinite alternate; /* Zoom in and out animation */
-            z-index: 1; /* Lower z-index to ensure logo is behind buttons and iframe */
+            animation: zoomInOut 3s infinite alternate;
+            z-index: 1;
+            cursor: pointer;
         }
 
         /* Logo zoom in and out animation */
         @keyframes zoomInOut {
             0% {
-                transform: scale(1); /* Normal size */
+                transform: scale(1);
             }
             100% {
-                transform: scale(1.2); /* Zoomed in size */
+                transform: scale(1.2);
             }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <!-- Logo on the right side -->
-        <img src="LOGO JERSY.png" alt="Logo" class="logo"> <!-- Replace 'logo.png' with your logo path -->
+        <img src="LOGO JERSY.png" alt="Logo" class="logo" id="logo">
+
+        <!-- Test button below the logo -->
+        <button class="test-button" id="testButton" onclick="loadContent('test.html')">Test</button>
 
         <div class="header">
-            <!-- Add your header content here if needed -->
+          
         </div>
         
         <div class="buttons">
-            <button class="button" onclick="loadContent('Register.html')">Register Form</button>
-            <button class="button" onclick="loadContent('entrys.html')">Daily Running Entry</button>
-            <button class="button" onclick="loadContent('filter.html')">Running Log</button>
+            <button class="button" onclick="hideTestButton(); loadContent('Register.html')">Register Form</button>
+            <button class="button" onclick="hideTestButton(); loadContent('entrys.html')">Daily Running Entry</button>
+            <button class="button" onclick="hideTestButton(); loadContent('filter.html')">Running Log</button>
         </div>
         
         <iframe id="iframeContent" src="" style="display: none;"></iframe>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVFr7OiCxBG5MVQL3e6BJObqU95Q6MBSc",
+            authDomain: "upload-5a391.firebaseapp.com",
+            databaseURL: "https://upload-5a391-default-rtdb.firebaseio.com",
+            projectId: "upload-5a391",
+            storageBucket: "upload-5a391.firebasestorage.app",
+            messagingSenderId: "368816917135",
+            appId: "1:368816917135:web:ed5873e1a3c37e12da3efa",
+            measurementId: "G-Z3TRXZP3Q6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to load content into iframe
         function loadContent(page) {
             const iframe = document.getElementById('iframeContent');
-            iframe.style.display = 'block'; // Show the iframe
-            iframe.src = page; // Set the src to the HTML file you want to open
+            iframe.style.display = 'block';
+            iframe.src = page;
         }
+
+        // Function to hide the Test button
+        function hideTestButton() {
+            const testButton = document.getElementById('testButton');
+            testButton.style.display = 'none'; // Hide the Test button
+        }
+
+        // Function to save image and text to Firebase
+        function saveDataToFirebase(imageBase64, text) {
+            const timestamp = new Date().getTime(); // Unique ID for each entry
+            database.ref('savedData/' + timestamp).set({
+                image: imageBase64,
+                text: text,
+                timestamp: timestamp
+            }).then(() => {
+                console.log('Data saved to Firebase!');
+                alert('Data saved successfully!');
+            }).catch((error) => {
+                console.error('Error saving data:', error);
+            });
+        }
+
+        // Logo click event
+        document.getElementById('logo').addEventListener('click', function() {
+            // Trigger animation
+            this.style.animation = 'zoomInOut 1s forwards';
+
+            // Create file input for image selection
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageBase64 = e.target.result; // Convert image to Base64
+                    const text = prompt('Enter text to save:'); // Prompt for text
+                    if (text) {
+                        saveDataToFirebase(imageBase64, text); // Save image and text to Firebase
+                    }
+                };
+                reader.readAsDataURL(file); // Read image as Base64
+            };
+            fileInput.click(); // Open file selector
+        });
     </script>
 </body>
 </html>
