@@ -20,14 +20,7 @@
         }
 
         /* Background opacity animation */
-        @keyframes backgroundAnimation {
-            0% {
-                opacity: 0.8;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
+       
 
         /* Container styling */
         .container {
@@ -63,6 +56,8 @@
             gap: 20px;
             justify-content: center;
             margin-top: 30px;
+            position: relative; /* Ensure buttons are positioned relative to their container */
+            z-index: 2; /* Higher z-index to ensure buttons are in front of the logo */
         }
 
         .button {
@@ -96,6 +91,8 @@
             margin-top: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative; /* Ensure iframe is positioned relative to its container */
+            z-index: 2; /* Higher z-index to ensure iframe is in front of the logo */
         }
 
         /* Logo styling */
@@ -106,6 +103,7 @@
             width: 150px; /* Medium size */
             height: auto;
             animation: zoomInOut 3s infinite alternate; /* Zoom in and out animation */
+            z-index: 1; /* Lower z-index to ensure logo is behind buttons and iframe */
         }
 
         /* Logo zoom in and out animation */
