@@ -130,15 +130,10 @@
         }
 
         .table-container {
-            max-height: 300px;
+            max-height: 300px; /* Adjust height as needed */
             overflow-y: auto;
             position: relative;
             border: 1px solid #ccc;
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
         }
 
         table {
@@ -204,12 +199,13 @@
 
         <div id="totalDataCount">Total Participants: 0</div>
 
+        <!-- Entry Form -->
         <form id="runChallengeForm">
-            <label for="id">ID:</label>
-            <input type="text" id="id" name="id" required><br>
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName" required><br>
             
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required><br>
+            <label for="nickName">Nick Name:</label>
+            <input type="text" id="nickName" name="nickName" required><br>
             
             <label for="contact">Contact:</label>
             <input type="text" id="contact" name="contact" required><br>
@@ -217,28 +213,36 @@
             <button type="submit">Register</button>
         </form>
 
-        <button class="admin-btn" id="adminBtn">Admin</button>
-        <button class="show-table-btn" id="showTableBtn">Show Data</button>
-
-        <div class="search-container">
-            <input type="text" id="searchBar" class="search-input" placeholder="Search by ID, Name, or Contact">
+        <!-- Always Visible: Enter Contact to Auto-Fill Form Search Bar -->
+        <div id="autoFillSearchContainer" style="margin-top: 20px;">
+            <input type="text" id="autoFillSearchBar" class="search-input" placeholder="Enter Contact to Auto-Fill Form">
         </div>
 
-        <div id="dataTable" style="display: none;">
-            <div class="table-container">
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dataBody">
-                        </tbody>
-                    </table>
+        <!-- Admin Button -->
+        <button class="admin-btn" id="adminBtn">Admin</button>
+
+        <!-- Hidden by Default: Saved Data Table -->
+        <div id="adminSection" style="display: none;">
+            <div class="search-container">
+                <input type="text" id="searchBar" class="search-input" placeholder="Search by Full Name, Nick Name, or Contact">
+            </div>
+
+            <div id="dataTable">
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Nick Name</th>
+                                    <th>Contact</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -264,23 +268,24 @@
         document.getElementById("runChallengeForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const id = document.getElementById("id").value;
-            const name = document.getElementById("name").value;
+            const fullName = document.getElementById("fullName").value;
+            const nickName = document.getElementById("nickName").value;
             const contact = document.getElementById("contact").value;
 
-            database.ref('participants/' + id).once('value', function(snapshot) {
+            // Check if contact number already exists
+            database.ref('participants').orderByChild('contact').equalTo(contact).once('value', function(snapshot) {
                 if (snapshot.exists()) {
-                    alert("This ID has already been registered.");
+                    alert("This contact number has already been registered.");
                 } else {
-                    database.ref('participants/' + id).set({ name, contact });
+                    database.ref('participants/' + fullName).set({ nickName, contact });
 
                     const newRow = document.createElement('tr');
-                    newRow.id = `row-${id}`;
+                    newRow.id = `row-${fullName}`;
                     newRow.innerHTML = `
-                        <td>${id}</td>
-                        <td>${name}</td>
+                        <td>${fullName}</td>
+                        <td>${nickName}</td>
                         <td>${contact}</td>
-                        <td><button class="delete-btn" data-id="${id}" style="display: none;">Delete</button></td>
+                        <td><button class="delete-btn" data-id="${fullName}" style="display: none;">Delete</button></td>
                     `;
                     document.getElementById("dataBody").appendChild(newRow);
                     alert("Registration successful!");
@@ -293,31 +298,15 @@
         document.getElementById("adminBtn").addEventListener("click", function() {
             const password = prompt("Enter Admin Password:");
             if (password === "1234") {
+                // Hide the entry form and show the saved data table
+                document.getElementById("runChallengeForm").style.display = "none";
+                document.getElementById("adminSection").style.display = "block";
                 const deleteBtns = document.querySelectorAll(".delete-btn");
                 deleteBtns.forEach(btn => {
                     btn.style.display = 'inline-block';
                 });
             } else {
                 alert("Incorrect password!");
-            }
-        });
-
-        document.getElementById("showTableBtn").addEventListener("click", function() {
-            const table = document.getElementById("dataTable");
-            const form = document.getElementById("runChallengeForm");
-            const adminBtn = document.getElementById("adminBtn");
-            const searchBar = document.querySelector(".search-container");
-
-            if (table.style.display === "none" || table.style.display === "") {
-                table.style.display = "block";
-                adminBtn.style.display = "block";
-                searchBar.style.display = "block";
-                form.style.display = "none";
-            } else {
-                table.style.display = "none";
-                adminBtn.style.display = "none";
-                searchBar.style.display = "none";
-                form.style.display = "block";
             }
         });
 
@@ -330,19 +319,37 @@
             }
         });
 
+        document.getElementById("autoFillSearchBar").addEventListener("input", function(event) {
+            const contact = event.target.value;
+            database.ref('participants').orderByChild('contact').equalTo(contact).once('value', function(snapshot) {
+                if (snapshot.exists()) {
+                    snapshot.forEach(function(childSnapshot) {
+                        const data = childSnapshot.val();
+                        document.getElementById("fullName").value = childSnapshot.key;
+                        document.getElementById("nickName").value = data.nickName;
+                        document.getElementById("contact").value = data.contact;
+                    });
+                } else {
+                    document.getElementById("fullName").value = "";
+                    document.getElementById("nickName").value = "";
+                    document.getElementById("contact").value = "";
+                }
+            });
+        });
+
         window.onload = function() {
             database.ref('participants').on('value', function(snapshot) {
                 const data = snapshot.val();
                 const dataBody = document.getElementById("dataBody");
                 dataBody.innerHTML = '';
-                for (const id in data) {
+                for (const fullName in data) {
                     const newRow = document.createElement('tr');
-                    newRow.id = `row-${id}`;
+                    newRow.id = `row-${fullName}`;
                     newRow.innerHTML = `
-                        <td>${id}</td>
-                        <td>${data[id].name}</td>
-                        <td>${data[id].contact}</td>
-                        <td><button class="delete-btn" data-id="${id}" style="display: none;">Delete</button></td>
+                        <td>${fullName}</td>
+                        <td>${data[fullName].nickName}</td>
+                        <td>${data[fullName].contact}</td>
+                        <td><button class="delete-btn" data-id="${fullName}" style="display: none;">Delete</button></td>
                     `;
                     dataBody.appendChild(newRow);
                 }
@@ -361,10 +368,10 @@
             const query = event.target.value.toLowerCase();
             const rows = document.querySelectorAll("#dataBody tr");
             rows.forEach(row => {
-                const id = row.cells[0].textContent.toLowerCase();
-                const name = row.cells[1].textContent.toLowerCase();
+                const fullName = row.cells[0].textContent.toLowerCase();
+                const nickName = row.cells[1].textContent.toLowerCase();
                 const contact = row.cells[2].textContent.toLowerCase();
-                if (id.includes(query) || name.includes(query) || contact.includes(query)) {
+                if (fullName.includes(query) || nickName.includes(query) || contact.includes(query)) {
                     row.style.display = "";
                 } else {
                     row.style.display = "none";
