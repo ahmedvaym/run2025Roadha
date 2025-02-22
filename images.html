@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Saved Data</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery with Admin Controls</title>
+    <style>
+        /* Body styling with background image */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://via.placeholder.com/1920x1080'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Top section styling */
+        .top-section {
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Filter select styling */
+        #filterSelect {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+        }
+
+        /* Gallery styling */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .gallery-item p {
+            padding: 15px;
+            font-size: 1.1rem;
+            color: #555;
+            text-align: center;
+        }
+
+        /* Admin button styling */
+        .admin-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Action buttons styling */
+        .action-buttons {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-buttons button {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons button:hover {
+            background-color: #cc0000;
+        }
+
+        /* Modal overlay styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .close-button:hover {
+            background-color: #cc0000;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+</head>
+<body>
+    <div class="top-section">
+        <select id="filterSelect">
+            <option value="">Select an image name</option>
+        </select>
+    </div>
+    <div class="gallery" id="gallery"></div>
+
+    <!-- Modal overlay for image preview -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Preview">
+            <button class="close-button" id="closeButton">&times;</button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVFr7OiCxBG5MVQL3e6BJObqU95Q6MBSc",
+            authDomain: "upload-5a391.firebaseapp.com",
+            databaseURL: "https://upload-5a391-default-rtdb.firebaseio.com",
+            projectId: "upload-5a391",
+            storageBucket: "upload-5a391.firebasestorage.app",
+            messagingSenderId: "368816917135",
+            appId: "1:368816917135:web:ed5873e1a3c37e12da3efa",
+            measurementId: "G-Z3TRXZP3Q6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Fetch saved data from Firebase
+        database.ref('savedData').on('value', (snapshot) => {
+            const savedData = snapshot.val();
+            const gallery = document.getElementById('gallery');
+            const filterSelect = document.getElementById('filterSelect');
+            gallery.innerHTML = ''; // Clear previous content
+            filterSelect.innerHTML = '<option value="">Select an image name</option>'; // Reset filter options
+
+            if (savedData) {
+                Object.keys(savedData).forEach((key) => {
+                    const data = savedData[key];
+                    const galleryItem = document.createElement('div');
+                    galleryItem.classList.add('gallery-item');
+
+                    // Display image
+                    const image = document.createElement('img');
+                    image.src = data.image;
+                    galleryItem.appendChild(image);
+
+                    // Display text
+                    const text = document.createElement('p');
+                    text.textContent = data.text;
+                    galleryItem.appendChild(text);
+
+                    // Add Admin button
+                    const adminButton = document.createElement('button');
+                    adminButton.classList.add('admin-button');
+                    adminButton.textContent = 'Admin';
+                    galleryItem.appendChild(adminButton);
+
+                    // Add action buttons container
+                    const actionButtons = document.createElement('div');
+                    actionButtons.classList.add('action-buttons');
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    actionButtons.appendChild(deleteButton);
+                    galleryItem.appendChild(actionButtons);
+
+                    // Handle Admin button click
+                    adminButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent gallery item click
+                        const password = prompt('Enter admin password:');
+                        if (password === '123') {
+                            actionButtons.style.display = 'block'; // Show action buttons
+                        } else {
+                            alert('Incorrect password!');
+                        }
+                    });
+
+                    // Handle Delete button click
+                    deleteButton.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this item?')) {
+                            database.ref('savedData/' + key).remove()
+                                .then(() => alert('Item deleted successfully!'))
+                                .catch((error) => alert('Error deleting item: ' + error.message));
+                        }
+                    });
+
+                    // Handle gallery item click
+                    galleryItem.addEventListener('click', () => {
+                        const modalOverlay = document.getElementById('modalOverlay');
+                        const modalImage = document.getElementById('modalImage');
+                        modalImage.src = data.image;
+                        modalOverlay.classList.add('active');
+                    });
+
+                    gallery.appendChild(galleryItem);
+
+                    // Add image name to filter dropdown
+                    const option = document.createElement('option');
+                    option.value = data.text; // Use text as the filter value
+                    option.textContent = data.text;
+                    filterSelect.appendChild(option);
+                });
+
+                // Handle filter selection
+                filterSelect.addEventListener('change', () => {
+                    const selectedValue = filterSelect.value.toLowerCase();
+                    const galleryItems = document.querySelectorAll('.gallery-item');
+
+                    galleryItems.forEach((item) => {
+                        const text = item.querySelector('p').textContent.toLowerCase();
+                        if (selectedValue === "" || text.includes(selectedValue)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            } else {
+                gallery.innerHTML = '<p>No data saved yet.</p>';
+            }
+        });
+
+        // Close modal functionality
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeButton = document.getElementById('closeButton');
+
+        closeButton.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
