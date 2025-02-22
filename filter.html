@@ -17,222 +17,220 @@
         }
   </style>
 
-  <div class="container">
-    <h1>ރޯދަ ރަން 2025</h1>
+<div class="container">
+  <h1>ރޯދަ ރަން 2025</h1>
 
-    <h2></h2>
-    <select id="nameFilter">
-      <option value="">All</option>
-      <!-- Dynamic Name Options will be added here -->
-    </select>
+  <!-- Name Filter Dropdown -->
+  <select id="nameFilter">
+    <option value="">All</option>
+    <!-- Dynamic Name Options will be added here -->
+  </select>
 
-    <!-- Total Distance Section -->
-    <div class="total-distance-container">
-      <h2>Total Distance</h2>
-      <p id="totalDistance">0 km</p>
-    </div>
-
-    <h2>Running Log</h2>
-    <div class="table-container">
-      <table id="logTable">
-        <thead>
-          <tr>
-            <th>Date and Time</th>
-            <th>Name</th>
-            <th>Contact</th>
-            <th>Distance (km)</th>
-            <th>Pace (min/km)</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Data will appear here -->
-        </tbody>
-      </table>
-    </div>
+  <div class="total-distance-container">
+    <h2>Total Distance</h2>
+    <p id="totalDistance">0 km</p>
   </div>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-    import { getDatabase, ref, onChildAdded, update, remove } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
+  <h2>Running Log</h2>
+  <div class="table-container">
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Nickname</th>
+          <th>Distance (km)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will appear here -->
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyClxIK0xiQh4XGZTgYuRHqq5xNT7iIGYjw",
-      authDomain: "runninglog-f16f7.firebaseapp.com",
-      projectId: "runninglog-f16f7",
-      storageBucket: "runninglog-f16f7.appspot.com",
-      messagingSenderId: "143536384226",
-      appId: "1:143536384226:web:d35c56b74cfd62dc06d6bb",
-      measurementId: "G-2Z7W4TFCZ4"
-    };
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+  import { getDatabase, ref, onChildAdded, update, remove } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyClxIK0xiQh4XGZTgYuRHqq5xNT7iIGYjw",
+    authDomain: "runninglog-f16f7.firebaseapp.com",
+    projectId: "runninglog-f16f7",
+    storageBucket: "runninglog-f16f7.appspot.com",
+    messagingSenderId: "143536384226",
+    appId: "1:143536384226:web:d35c56b74cfd62dc06d6bb",
+    measurementId: "G-2Z7W4TFCZ4"
+  };
 
-    const nameSet = new Set(); // To store unique names for the filter dropdown
-    const totalDistanceMap = new Map(); // To store total distance for each person
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
 
-    // Fetch data from Firebase
-    const runningLogRef = ref(database, 'runningLogs');
-    onChildAdded(runningLogRef, function(snapshot) {
-      const data = snapshot.val();
-      addRowToTable(snapshot.key, data);
-      updateTotalDistance(data.name, parseFloat(data.distance));
+  const nameSet = new Set(); // To store unique names for the filter dropdown
+  const totalDistanceMap = new Map(); // To store total distance for each person
+
+  // Fetch data from Firebase
+  const runningLogRef = ref(database, 'runningLogs');
+  onChildAdded(runningLogRef, function(snapshot) {
+    const data = snapshot.val();
+    addRowToTable(snapshot.key, data);
+    updateTotalDistance(data.name, parseFloat(data.distance));
+    updateNameFilter(data.name); // Update the name filter dropdown
+  });
+
+  // Function to add a row to the table
+  function addRowToTable(key, data) {
+    const table = document.getElementById('logTable').getElementsByTagName('tbody')[0];
+    const row = table.insertRow();
+
+    row.id = `row_${key}`; // Assign a unique ID to the row
+    row.innerHTML = `
+      <td>${data.date}</td>
+      <td>${data.name}</td>
+      <td>${data.nickname}</td>
+      <td>${data.distance}</td>
+      <td class="status-${data.status}">${data.status}</td>
+      <td>
+        ${data.status === "pending" ? 
+          `<button id="approveBtn_${key}" onclick="approveData('${key}')">Approve</button>` : ''}
+        <button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>
+      </td>
+    `;
+  }
+
+  // Function to update the name filter dropdown
+  function updateNameFilter(name) {
+    if (name) {
+      nameSet.add(name); // Add the new name to the set
+    }
+
+    const nameFilter = document.getElementById('nameFilter');
+    nameFilter.innerHTML = `<option value="">All</option>`; // Reset the dropdown
+
+    nameSet.forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      nameFilter.appendChild(option);
     });
 
-    // Function to add a row to the table
-    function addRowToTable(key, data) {
-      const table = document.getElementById('logTable').getElementsByTagName('tbody')[0];
-      const row = table.insertRow();
+    // Add event listener to filter by selected name
+    nameFilter.addEventListener('change', function() {
+      filterTableByName(this.value);
+    });
+  }
 
-      row.id = `row_${key}`; // Assign a unique ID to the row
-      row.innerHTML = `
-        <td>${data.date}</td>
-        <td>${data.name}</td>
-        <td>${data.contact}</td>
-        <td>${data.distance}</td>
-        <td>${data.pace}</td>
-        <td class="status-${data.status}">${data.status}</td>
-        <td>
-          ${data.status === "pending" ? 
-            `<button id="approveBtn_${key}" onclick="approveData('${key}')">Approve</button>` : ''}
-          <button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>
-        </td>
-      `;
+  // Function to filter the table based on selected name
+  function filterTableByName(selectedName) {
+    const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+    let totalDistance = 0;
 
-      // Add name to name set for dynamic dropdown
-      nameSet.add(data.name);
-      updateNameFilter();
-    }
-
-    // Function to update the name filter dropdown
-    function updateNameFilter() {
-      const nameFilter = document.getElementById('nameFilter');
-      nameFilter.innerHTML = `<option value="">All</option>`; // Reset the dropdown
-      nameSet.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        nameFilter.appendChild(option);
-      });
-
-      // Add event listener to filter by selected name
-      nameFilter.addEventListener('change', function() {
-        filterTableByName(this.value);
-      });
-    }
-
-    // Function to filter the table based on selected name and calculate total distance
-    function filterTableByName(selectedName) {
-      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
-      let totalDistance = 0;
-
-      for (let row of rows) {
-        const nameCell = row.cells[1].textContent;
-        if (selectedName === "" || nameCell === selectedName) {
-          row.style.display = "";  // Show row
-          if (selectedName !== "") {
-            totalDistance += parseFloat(row.cells[3].textContent); // Add distance to total
-          }
-        } else {
-          row.style.display = "none";  // Hide row
+    for (let row of rows) {
+      const nameCell = row.cells[1].textContent;
+      if (selectedName === "" || nameCell === selectedName) {
+        row.style.display = ""; // Show row
+        if (selectedName !== "") {
+          totalDistance += parseFloat(row.cells[3].textContent); // Add distance to total
         }
-      }
-
-      // Update the total distance display
-      const totalDistanceElement = document.getElementById('totalDistance');
-      if (selectedName === "") {
-        totalDistanceElement.textContent = "0 km"; // Reset to 0 if "All" is selected
       } else {
-        totalDistanceElement.textContent = `${totalDistance.toFixed(2)} km`; // Display total distance
+        row.style.display = "none"; // Hide row
       }
     }
 
-    // Function to update total distance for each person
-    function updateTotalDistance(name, distance) {
-      if (totalDistanceMap.has(name)) {
-        totalDistanceMap.set(name, totalDistanceMap.get(name) + distance);
-      } else {
-        totalDistanceMap.set(name, distance);
-      }
+    // Update the total distance display
+    const totalDistanceElement = document.getElementById('totalDistance');
+    if (selectedName === "") {
+      totalDistanceElement.textContent = "0 km"; // Reset to 0 if "All" is selected
+    } else {
+      totalDistanceElement.textContent = `${totalDistance.toFixed(2)} km`; // Display total distance
+    }
+  }
 
-      // Check if the person has completed 100 km
-      if (totalDistanceMap.get(name) >= 100) {
-        highlightWinner(name);
-        showCongratulation(name);
-      }
+  // Function to update total distance for each person
+  function updateTotalDistance(name, distance) {
+    if (totalDistanceMap.has(name)) {
+      totalDistanceMap.set(name, totalDistanceMap.get(name) + distance);
+    } else {
+      totalDistanceMap.set(name, distance);
     }
 
-    // Function to highlight the winner
-    function highlightWinner(name) {
-      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
-      for (let row of rows) {
-        if (row.cells[1].textContent === name) {
-          row.classList.add('winner');
+    // Check if the person has completed 100 km
+    if (totalDistanceMap.get(name) >= 100) {
+      highlightWinner(name);
+      showCongratulation(name);
+    }
+  }
+
+  // Function to highlight the winner
+  function highlightWinner(name) {
+    const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+    for (let row of rows) {
+      if (row.cells[1].textContent === name) {
+        row.classList.add('winner');
+      }
+    }
+  }
+
+  // Function to show congratulation message with animation
+  function showCongratulation(name) {
+    const congratulationDiv = document.createElement('div');
+    congratulationDiv.className = 'congratulation';
+    congratulationDiv.textContent = `Congratulations ${name}! 🎉`;
+    document.body.appendChild(congratulationDiv);
+
+    // Remove the congratulation message after 3 seconds
+    setTimeout(() => {
+      congratulationDiv.remove();
+    }, 3000);
+  }
+
+  // Function to approve data when "Approve" is pressed
+  window.approveData = function(key) {
+    const password = prompt("Enter password to approve data:");
+    if (password === "123") {
+      const dataRef = ref(database, 'runningLogs/' + key);
+      update(dataRef, {
+        status: "approved" // Change the status to approved
+      }).then(() => {
+        // Update the UI immediately
+        const row = document.getElementById(`row_${key}`);
+        if (row) {
+          row.cells[4].textContent = "approved";
+          row.cells[4].className = "status-approved";
+          row.cells[5].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`; // Keep delete button
         }
-      }
+        alert("Data approved successfully!");
+      }).catch(error => {
+        alert("Error approving data: " + error);
+      });
+    } else {
+      alert("Incorrect password! Data not approved.");
     }
+  };
 
-    // Function to show congratulation message with animation
-    function showCongratulation(name) {
-      const congratulationDiv = document.createElement('div');
-      congratulationDiv.className = 'congratulation';
-      congratulationDiv.textContent = `Congratulations ${name}! 🎉`;
-      document.body.appendChild(congratulationDiv);
-
-      // Remove the congratulation message after 3 seconds
-      setTimeout(() => {
-        congratulationDiv.remove();
-      }, 3000);
+  // Function to delete data
+  window.deleteData = function(key) {
+    const password = prompt("Enter password to delete data:");
+    if (password === "123") {
+      const dataRef = ref(database, 'runningLogs/' + key);
+      remove(dataRef).then(() => {
+        const row = document.getElementById(`row_${key}`);
+        if (row) {
+          row.remove(); // Remove the row from the table
+        }
+        alert("Data deleted successfully!");
+      }).catch(error => {
+        alert("Error deleting data: " + error);
+      });
+    } else {
+      alert("Incorrect password! Data not deleted.");
     }
-
-    // Function to approve data when "Approve" is pressed
-    window.approveData = function(key) {
-      const password = prompt("Enter password to approve data:");
-      if (password === "123") {
-        const dataRef = ref(database, 'runningLogs/' + key);
-        update(dataRef, {
-          status: "approved" // Change the status to approved
-        }).then(() => {
-          // Update the UI immediately
-          const row = document.getElementById(`row_${key}`);
-          if (row) {
-            row.cells[5].textContent = "approved";
-            row.cells[5].className = "status-approved";
-            row.cells[6].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`; // Keep delete button
-          }
-          alert("Data approved successfully!");
-        }).catch(error => {
-          alert("Error approving data: " + error);
-        });
-      } else {
-        alert("Incorrect password! Data not approved.");
-      }
-    };
-
-    // Function to delete data
-    window.deleteData = function(key) {
-      const password = prompt("Enter password to delete data:");
-      if (password === "123") {
-        const dataRef = ref(database, 'runningLogs/' + key);
-        remove(dataRef).then(() => {
-          const row = document.getElementById(`row_${key}`);
-          if (row) {
-            row.remove(); // Remove the row from the table
-          }
-          alert("Data deleted successfully!");
-        }).catch(error => {
-          alert("Error deleting data: " + error);
-        });
-      } else {
-        alert("Incorrect password! Data not deleted.");
-      }
-    };
-  </script>
-
+  };
+</script>
 </body>
 </html>
