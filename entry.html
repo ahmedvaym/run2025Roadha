@@ -82,7 +82,7 @@ h1 {
       flex-direction: column;
     }
 
-    input[type="text"], input[type="number"], input[type="datetime-local"] {
+    input[type="text"], input[type="number"], input[type="date"] {
       padding: 10px; /* Adjusted for mobile */
       font-size: 16px; /* Adjusted for mobile */
       border: 1px solid #ccc;
@@ -115,7 +115,7 @@ h1 {
         font-size: 20px; /* Smaller font for very small screens */
       }
 
-      input[type="text"], input[type="number"], input[type="datetime-local"] {
+      input[type="text"], input[type="number"], input[type="date"] {
         font-size: 14px; /* Smaller font for very small screens */
       }
 
@@ -132,8 +132,8 @@ h1 {
     
     <form id="runningForm">
       <div class="form-group">
-        <label for="date">Select Date and Time:</label>
-        <input type="datetime-local" id="date" required>
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" required>
       </div>
       
       <div class="form-group">
@@ -142,18 +142,13 @@ h1 {
       </div>
       
       <div class="form-group">
-        <label for="contact">Contact:</label>
-        <input type="text" id="contact" placeholder="Enter your contact" required>
+        <label for="nickname">Nickname:</label>
+        <input type="text" id="nickname" placeholder="Enter your nickname" required>
       </div>
       
       <div class="form-group">
         <label for="distance">Running Distance (km):</label>
         <input type="number" id="distance" placeholder="Enter distance" step="0.01" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="pace">Running Pace (min/km):</label>
-        <input type="number" id="pace" placeholder="Enter pace" step="0.01" required>
       </div>
       
       <button type="submit">Add</button>
@@ -187,20 +182,18 @@ h1 {
 
       const date = document.getElementById('date').value;
       const name = document.getElementById('name').value;
-      const contact = document.getElementById('contact').value;
+      const nickname = document.getElementById('nickname').value;
       const distance = parseFloat(document.getElementById('distance').value); // Parse as float
-      const pace = parseFloat(document.getElementById('pace').value); // Parse as float
 
-      if (date && name && contact && !isNaN(distance) && !isNaN(pace)) {
+      if (date && name && nickname && !isNaN(distance)) {
         // Save data to Firebase as "pending"
         const runningLogRef = ref(database, 'runningLogs');
         const newEntry = push(runningLogRef);
         set(newEntry, {
-          date: new Date(date).toLocaleString(),
+          date: new Date(date).toLocaleDateString(), // Only date, no time
           name: name,
-          contact: contact,
+          nickname: nickname, // Changed from "contact" to "nickname"
           distance: distance, // Decimal value
-          pace: pace, // Decimal value
           status: "pending" // Status added as "pending"
         });
 
