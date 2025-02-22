@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Running Entry</title>
+  <style>
+      body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('WhatsApp Image 2025-02-20 at 21.37.12.jpeg'); /* Add your image URL */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+    body::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: url('WhatsApp Image 2025-02-20 at 21.37.12.jpeg'); /* Your watermark logo */
+            background-size: 100% 100%; /* Make the image fill the entire container */
+            background-repeat: no-repeat;
+            opacity: 0.1; /* Control the opacity of the watermark */
+            width: 100%; /* Ensure it fits the container */
+            height: 100%; /* Ensure it fits the container */
+            pointer-events: none; /* Ensure it doesn't interfere with clicking elements */
+            z-index: 0;
+
+            /* Animation for zoom effect */
+            animation: zoomInOut 10s infinite ease-in-out;
+        }
+
+        /* Zoom-in and zoom-out animation */
+        @keyframes zoomInOut {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+    .container {
+      width: 90%; /* Adjusted for mobile */
+      max-width: 400px; /* Adjusted for mobile */
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px; /* Added for better mobile appearance */
+    }
+
+    /* Load Faruma font */
+    @import url('https://fonts.googleapis.com/css2?family=Faruma&display=swap');
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    font-family: 'Faruma', sans-serif; /* Apply Faruma font */
+}
+
+    form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"], input[type="number"], input[type="date"] {
+      padding: 10px; /* Adjusted for mobile */
+      font-size: 16px; /* Adjusted for mobile */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #564cc0;
+      color: white;
+      border: none;
+      padding: 12px 20px; /* Adjusted for mobile */
+      font-size: 16px; /* Adjusted for mobile */
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%; /* Full width for mobile */
+    }
+
+    button:hover {
+      background-color: #343734;
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 480px) {
+      .container {
+        width: 95%; /* Further adjustment for very small screens */
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 20px; /* Smaller font for very small screens */
+      }
+
+      input[type="text"], input[type="number"], input[type="date"] {
+        font-size: 14px; /* Smaller font for very small screens */
+      }
+
+      button {
+        padding: 10px 15px; /* Smaller padding for very small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>ރޯދަ ރަން 2025</h1>
+    
+    <form id="runningForm">
+      <div class="form-group">
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="nickname">Nickname:</label>
+        <input type="text" id="nickname" placeholder="Enter your nickname" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="distance">Running Distance (km):</label>
+        <input type="number" id="distance" placeholder="Enter distance" step="0.01" required>
+      </div>
+      
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+    import { getDatabase, ref, push, set } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyClxIK0xiQh4XGZTgYuRHqq5xNT7iIGYjw",
+      authDomain: "runninglog-f16f7.firebaseapp.com",
+      projectId: "runninglog-f16f7",
+      storageBucket: "runninglog-f16f7.appspot.com",
+      messagingSenderId: "143536384226",
+      appId: "1:143536384226:web:d35c56b74cfd62dc06d6bb",
+      measurementId: "G-2Z7W4TFCZ4"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Handle form submission
+    document.getElementById('runningForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const date = document.getElementById('date').value;
+      const name = document.getElementById('name').value;
+      const nickname = document.getElementById('nickname').value;
+      const distance = parseFloat(document.getElementById('distance').value); // Parse as float
+
+      if (date && name && nickname && !isNaN(distance)) {
+        // Save data to Firebase as "pending"
+        const runningLogRef = ref(database, 'runningLogs');
+        const newEntry = push(runningLogRef);
+        set(newEntry, {
+          date: new Date(date).toLocaleDateString(), // Only date, no time
+          name: name,
+          nickname: nickname, // Changed from "contact" to "nickname"
+          distance: distance, // Decimal value
+          status: "pending" // Status added as "pending"
+        });
+
+        // Clear form fields
+        document.getElementById('runningForm').reset();
+        alert("Data saved successfully!");
+      } else {
+        alert("Please fill in all fields correctly.");
+      }
+    });
+  </script>
+
+</body>
+</html>
