@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Saved Data</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery with Admin Controls</title>
     <style>
         /* Body styling with background image */
         body {
@@ -80,7 +86,6 @@
 
         /* Admin button styling */
         .admin-button {
-            display: none;
             position: absolute;
             top: 10px;
             right: 10px;
@@ -91,10 +96,6 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9rem;
-        }
-
-        .gallery-item.selected .admin-button {
-            display: block;
         }
 
         /* Action buttons styling */
@@ -259,7 +260,7 @@
                         e.stopPropagation(); // Prevent gallery item click
                         const password = prompt('Enter admin password:');
                         if (password === '123') {
-                            actionButtons.style.display = 'block';
+                            actionButtons.style.display = 'block'; // Show action buttons
                         } else {
                             alert('Incorrect password!');
                         }
