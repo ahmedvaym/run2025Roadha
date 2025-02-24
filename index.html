@@ -79,6 +79,11 @@
             transform: translateY(0);
         }
 
+        /* Selected button styling */
+        .button.selected {
+            background-color: #777; /* Gray color for selected button */
+        }
+
         /* Screenshot button styling */
         .test-button {
             padding: 5px 10px; /* Smaller padding */
@@ -155,9 +160,9 @@
         </div>
         
         <div class="buttons">
-            <button class="button" onclick="hideTestButton(); loadContent('Register.html')">Register Form</button>
-            <button class="button" onclick="hideTestButton(); loadContent('entrys.html')">Daily Running Entry</button>
-            <button class="button" onclick="hideTestButton(); loadContent('filter.html')">Running Log</button>
+            <button class="button" id="registerButton" onclick="selectButton(this); loadContent('Register.html')">Register Form</button>
+            <button class="button" id="dailyEntryButton" onclick="selectButton(this); loadContent('entrys.html')">Daily Running Entry</button>
+            <button class="button" id="runningLogButton" onclick="selectButton(this); loadContent('filter.html')">Running Log</button>
         </div>
         
         <iframe id="iframeContent" src="" style="display: none;"></iframe>
@@ -195,6 +200,15 @@
         function hideTestButton() {
             const testButton = document.getElementById('testButton');
             testButton.style.display = 'none'; // Hide the Screenshot button
+        }
+
+        // Function to highlight the selected button
+        function selectButton(selectedButton) {
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                button.classList.remove('selected');
+            });
+            selectedButton.classList.add('selected');
         }
 
         // Function to save image and text to Firebase
