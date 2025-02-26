@@ -239,6 +239,14 @@
       color: #ffd700; /* Gold color */
     }
 
+    /* Medal Details Section */
+    .medal-details {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
     /* Responsive Styles */
     @media (max-width: 768px) {
       h1 {
@@ -268,6 +276,10 @@
 
       #totalDistance {
         font-size: 20px;
+      }
+
+      .medal-details {
+        font-size: 1em;
       }
     }
 
@@ -299,6 +311,10 @@
 
       #totalDistance {
         font-size: 18px;
+      }
+
+      .medal-details {
+        font-size: 0.9em;
       }
     }
 
@@ -335,6 +351,10 @@
       #totalDistance {
         font-size: 16px;
       }
+
+      .medal-details {
+        font-size: 0.8em;
+      }
     }
   </style>
 </head>
@@ -359,6 +379,10 @@
     <!-- Running Log Section -->
     <div class="running-log-header">
       <h2>Running Log</h2>
+      <!-- Medal Details -->
+      <div class="medal-details">
+        🥉 Bronze for 50 km | 🥈 Silver for 75 km | 🥇 Gold for 100 km
+      </div>
       <div class="winners-button-container">
         <button id="winnersButton">Show Winners</button>
       </div>
