@@ -222,6 +222,23 @@
       margin-top: 20px;
     }
 
+    /* Medal Styles */
+    .medal {
+      font-size: 1.5em;
+    }
+
+    .bronze {
+      color: #cd7f32; /* Bronze color */
+    }
+
+    .silver {
+      color: #c0c0c0; /* Silver color */
+    }
+
+    .gold {
+      color: #ffd700; /* Gold color */
+    }
+
     /* Responsive Styles */
     @media (max-width: 768px) {
       h1 {
@@ -356,6 +373,7 @@
             <th>Contact</th> <!-- Hidden Column -->
             <th>Distance (km)</th>
             <th>Status</th>
+            <th>Medals</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -377,6 +395,7 @@
               <th>Nickname</th>
               <th>Contact</th> <!-- Hidden Column -->
               <th>Total Distance (km)</th>
+              <th>Medals</th>
             </tr>
           </thead>
           <tbody>
@@ -435,6 +454,7 @@
         <td>${data.contact}</td> <!-- Hidden Column -->
         <td>${data.distance}</td>
         <td class="status-${data.status}">${data.status}</td>
+        <td class="medal">${getMedals(data.name)}</td>
         <td>
           ${data.status === "pending" ? 
             `<button id="approveBtn_${key}" onclick="approveData('${key}')">Approve</button>` : ''}
@@ -519,7 +539,7 @@
             row.cells[5].className = "status-approved";
 
             // Remove the Approve button
-            row.cells[6].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`;
+            row.cells[7].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`;
 
             // Update the total distance
             updateTotalDistance(name, distance);
@@ -567,6 +587,40 @@
         showCongratulation(name);
         updateWinnersTable(); // Update the winners table
       }
+
+      // Update the medals for the person
+      updateMedals(name);
+    }
+
+    // Function to update the medals for a person
+    function updateMedals(name) {
+      const totalDistance = totalDistanceMap.get(name) || 0;
+      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+
+      for (let row of rows) {
+        if (row.cells[1].textContent === name) {
+          row.cells[6].innerHTML = getMedals(name);
+          break;
+        }
+      }
+    }
+
+    // Function to get the medals for a person
+    function getMedals(name) {
+      const totalDistance = totalDistanceMap.get(name) || 0;
+      let medals = '';
+
+      if (totalDistance >= 100) {
+        medals += '<span class="medal gold">🥇</span>'; // Gold medal
+      }
+      if (totalDistance >= 75) {
+        medals += '<span class="medal silver">🥈</span>'; // Silver medal
+      }
+      if (totalDistance >= 50) {
+        medals += '<span class="medal bronze">🥉</span>'; // Bronze medal
+      }
+
+      return medals;
     }
 
     // Function to update the winners table
@@ -582,6 +636,7 @@
           <td>${getNickname(name)}</td>
           <td>${getContact(name)}</td>
           <td>${totalDistanceMap.get(name).toFixed(2)} km</td>
+          <td class="medal">${getMedals(name)}</td>
         `;
       });
     }
@@ -620,15 +675,14 @@
 
     // Function to show congratulation message with animation
     function showCongratulation(name) {
-      const congratulationDiv = document.createElement('div');
-      congratulationDiv.className = 'congratulation';
-      congratulationDiv.textContent = `Congratulations ${name}! 🎉`;
-      document.body.appendChild(congratulationDiv);
+      const congratulation = document.createElement('div');
+      congratulation.className = 'congratulation';
+      congratulation.textContent = `Congratulations ${name}! 🎉`;
+      document.body.appendChild(congratulation);
 
-      // Remove the congratulation message after 3 seconds
       setTimeout(() => {
-        congratulationDiv.remove();
-      }, 3000);
+        congratulation.remove();
+      }, 4000);
     }
 
     // Toggle Winners Table Visibility
