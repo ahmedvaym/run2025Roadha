@@ -391,7 +391,9 @@
     onChildAdded(runningLogRef, function(snapshot) {
       const data = snapshot.val();
       addRowToTable(snapshot.key, data);
-      updateTotalDistance(data.name, parseFloat(data.distance));
+      if (data.status === "approved") {
+        updateTotalDistance(data.name, parseFloat(data.distance));
+      }
       updateNameFilter(data.name); // Update the name filter dropdown
     });
 
@@ -446,7 +448,7 @@
         const nameCell = row.cells[1].textContent;
         if (selectedName === "" || nameCell === selectedName) {
           row.style.display = ""; // Show row
-          if (selectedName !== "") {
+          if (selectedName !== "" && row.cells[4].textContent === "approved") {
             totalDistance += parseFloat(row.cells[3].textContent); // Add distance to total
           }
         } else {
