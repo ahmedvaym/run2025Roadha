@@ -145,6 +145,20 @@
                 transform: scale(1.2);
             }
         }
+
+        /* Custom font for the header */
+        @font-face {
+            font-family: 'SameeAvasThaana';
+            src: url('fonts/Samee_Avas_Thaana.ttf'); /* Path to your font file */
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            font-family: 'SameeAvasThaana', sans-serif; /* Apply custom font */
+        }
     </style>
 </head>
 <body>
@@ -153,18 +167,19 @@
         <img src="LOGO JERSY.png" alt="Logo" class="logo" id="logo">
 
         <!-- Screenshot button below the logo -->
-        <button class="test-button" id="testButton" onclick="loadContent('images.html')">Screenshot</button>
+        <button class="test-button" id="testButton">Screenshot</button>
 
-        <div class="header">
-          
+        <!-- Header for the screenshot page -->
+        <div class="header" id="screenshotHeader" style="display: none;">
+            <h1>qgol qnar adOr</h1>
         </div>
-        
-        <div class="buttons">
+
+        <div class="buttons" id="buttonsContainer">
             <button class="button" id="registerButton" onclick="selectButton(this); loadContent('Registers.html')">Register Form</button>
             <button class="button" id="dailyEntryButton" onclick="selectButton(this); loadContent('entrys.html')">Daily Running Entry</button>
             <button class="button" id="runningLogButton" onclick="selectButton(this); loadContent('filter.html')">Running Log</button>
         </div>
-        
+
         <iframe id="iframeContent" src="" style="display: none;"></iframe>
     </div>
 
@@ -196,10 +211,10 @@
             iframe.src = page;
         }
 
-        // Function to hide the Screenshot button
-        function hideTestButton() {
-            const testButton = document.getElementById('testButton');
-            testButton.style.display = 'none'; // Hide the Screenshot button
+        // Function to hide all buttons
+        function hideAllButtons() {
+            const buttonsContainer = document.getElementById('buttonsContainer');
+            buttonsContainer.style.display = 'none';
         }
 
         // Function to highlight the selected button
@@ -228,6 +243,9 @@
 
         // Logo click event
         document.getElementById('logo').addEventListener('click', function() {
+            // Hide all buttons
+            hideAllButtons();
+
             // Trigger animation
             this.style.animation = 'zoomInOut 1s forwards';
 
@@ -248,6 +266,19 @@
                 reader.readAsDataURL(file); // Read image as Base64
             };
             fileInput.click(); // Open file selector
+        });
+
+        // Screenshot button click event
+        document.getElementById('testButton').addEventListener('click', function() {
+            // Hide all buttons
+            hideAllButtons();
+
+            // Show the header
+            const screenshotHeader = document.getElementById('screenshotHeader');
+            screenshotHeader.style.display = 'block';
+
+            // Load the screenshot page
+            loadContent('images.html');
         });
     </script>
 </body>
