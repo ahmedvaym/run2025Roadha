@@ -61,8 +61,8 @@
       max-width: 900px;
       margin: 20px auto;
       background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
@@ -71,24 +71,38 @@
     }
 
     @font-face {
-    font-family: 'SameeAvasThaana';
-    src: url(fonts/Samee_Avas_Thaana.ttf);
-}
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-            font-family: 'SameeAvasThaana', sans-serif; /* Apply Faruma font */
-        }
+      font-family: 'SameeAvasThaana';
+      src: url(fonts/Samee_Avas_Thaana.ttf);
+    }
 
-    select {
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+      font-family: 'SameeAvasThaana', sans-serif; /* Apply Faruma font */
+    }
+
+    /* Search Bar Styles */
+    #contactSearch {
       width: 100%;
       padding: 10px;
       font-size: 16px;
       margin: 10px 0;
       border: 1px solid #ddd;
       border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Name Filter Dropdown Styles */
+    #nameFilter {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
 
     /* Table Styles */
@@ -116,6 +130,12 @@
       position: sticky; /* Make the header sticky */
       top: 0; /* Stick to the top of the container */
       z-index: 1; /* Ensure the header stays above the body */
+    }
+
+    /* Hide the Contact Column */
+    table th:nth-child(4),
+    table td:nth-child(4) {
+      display: none;
     }
 
     button {
@@ -305,6 +325,9 @@
   <div class="container">
     <h1> qgol qnar adOr</h1>
 
+    <!-- Search Bar for Contact Number -->
+    <input type="text" id="contactSearch" placeholder="Enter full contact number to search...">
+
     <!-- Name Filter Dropdown -->
     <select id="nameFilter">
       <option value="">All</option>
@@ -330,6 +353,7 @@
             <th>Date</th>
             <th>Name</th>
             <th>Nickname</th>
+            <th>Contact</th> <!-- Hidden Column -->
             <th>Distance (km)</th>
             <th>Status</th>
             <th>Actions</th>
@@ -351,6 +375,7 @@
               <th>Position</th>
               <th>Name</th>
               <th>Nickname</th>
+              <th>Contact</th> <!-- Hidden Column -->
               <th>Total Distance (km)</th>
             </tr>
           </thead>
@@ -407,6 +432,7 @@
         <td>${data.date}</td>
         <td>${data.name}</td>
         <td>${data.nickname}</td>
+        <td>${data.contact}</td> <!-- Hidden Column -->
         <td>${data.distance}</td>
         <td class="status-${data.status}">${data.status}</td>
         <td>
@@ -432,104 +458,46 @@
         option.textContent = name;
         nameFilter.appendChild(option);
       });
-
-      // Add event listener to filter by selected name
-      nameFilter.addEventListener('change', function() {
-        filterTableByName(this.value);
-      });
     }
 
-    // Function to filter the table based on selected name
-    function filterTableByName(selectedName) {
+    // Function to filter the table by exact contact number or selected name
+    function filterTable() {
+      const selectedName = document.getElementById('nameFilter').value.toLowerCase();
+      const searchTerm = document.getElementById('contactSearch').value.trim(); // Get the exact contact number
       const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
       let totalDistance = 0;
 
-      for (let row of rows) {
-        const nameCell = row.cells[1].textContent;
-        if (selectedName === "" || nameCell === selectedName) {
+      // Show all rows if "All" is selected and no contact number is entered
+      if (selectedName === "" && searchTerm === "") {
+        for (let row of rows) {
           row.style.display = ""; // Show row
-          if (selectedName !== "" && row.cells[4].textContent === "approved") {
-            totalDistance += parseFloat(row.cells[3].textContent); // Add distance to total
+          if (row.cells[5].textContent === "approved") {
+            totalDistance += parseFloat(row.cells[4].textContent); // Add distance to total
           }
-        } else {
-          row.style.display = "none"; // Hide row
+        }
+      } else {
+        // Show rows that match the selected name or exact contact number
+        for (let row of rows) {
+          const nameCell = row.cells[1].textContent.toLowerCase(); // Name is in the 2nd column (index 1)
+          const contactCell = row.cells[3].textContent.trim(); // Contact is in the 4th column (index 3)
+
+          const nameMatch = selectedName !== "" && nameCell.includes(selectedName);
+          const contactMatch = searchTerm !== "" && contactCell === searchTerm; // Exact match for contact
+
+          if (nameMatch || contactMatch) {
+            row.style.display = ""; // Show row
+            if (row.cells[5].textContent === "approved") {
+              totalDistance += parseFloat(row.cells[4].textContent); // Add distance to total
+            }
+          } else {
+            row.style.display = "none"; // Hide row
+          }
         }
       }
 
       // Update the total distance display
       const totalDistanceElement = document.getElementById('totalDistance');
-      if (selectedName === "") {
-        totalDistanceElement.textContent = "0 km"; // Reset to 0 if "All" is selected
-      } else {
-        totalDistanceElement.textContent = `${totalDistance.toFixed(2)} km`; // Display total distance
-      }
-    }
-
-    // Function to update total distance for each person
-    function updateTotalDistance(name, distance) {
-      if (totalDistanceMap.has(name)) {
-        totalDistanceMap.set(name, totalDistanceMap.get(name) + distance);
-      } else {
-        totalDistanceMap.set(name, distance);
-      }
-
-      // Check if the person has completed 100 km
-      if (totalDistanceMap.get(name) >= 100 && !winners.includes(name)) {
-        winners.push(name); // Add the winner to the array
-        highlightWinner(name);
-        showCongratulation(name);
-        updateWinnersTable(); // Update the winners table
-      }
-    }
-
-    // Function to update the winners table
-    function updateWinnersTable() {
-      const winnersTable = document.getElementById('winnersTable').getElementsByTagName('tbody')[0];
-      winnersTable.innerHTML = ''; // Clear the table
-
-      winners.forEach((name, index) => {
-        const row = winnersTable.insertRow();
-        row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${name}</td>
-          <td>${getNickname(name)}</td>
-          <td>${totalDistanceMap.get(name).toFixed(2)} km</td>
-        `;
-      });
-    }
-
-    // Function to get the nickname of a participant
-    function getNickname(name) {
-      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
-      for (let row of rows) {
-        if (row.cells[1].textContent === name) {
-          return row.cells[2].textContent;
-        }
-      }
-      return '';
-    }
-
-    // Function to highlight the winner
-    function highlightWinner(name) {
-      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
-      for (let row of rows) {
-        if (row.cells[1].textContent === name) {
-          row.classList.add('winner');
-        }
-      }
-    }
-
-    // Function to show congratulation message with animation
-    function showCongratulation(name) {
-      const congratulationDiv = document.createElement('div');
-      congratulationDiv.className = 'congratulation';
-      congratulationDiv.textContent = `Congratulations ${name}! 🎉`;
-      document.body.appendChild(congratulationDiv);
-
-      // Remove the congratulation message after 3 seconds
-      setTimeout(() => {
-        congratulationDiv.remove();
-      }, 3000);
+      totalDistanceElement.textContent = `${totalDistance.toFixed(2)} km`;
     }
 
     // Function to approve data when "Approve" is pressed
@@ -543,9 +511,18 @@
           // Update the UI immediately
           const row = document.getElementById(`row_${key}`);
           if (row) {
-            row.cells[4].textContent = "approved";
-            row.cells[4].className = "status-approved";
-            row.cells[5].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`; // Keep delete button
+            const name = row.cells[1].textContent; // Get the name from the table
+            const distance = parseFloat(row.cells[4].textContent); // Get the distance from the table
+
+            // Update the status in the UI
+            row.cells[5].textContent = "approved";
+            row.cells[5].className = "status-approved";
+
+            // Remove the Approve button
+            row.cells[6].innerHTML = `<button id="deleteBtn_${key}" onclick="deleteData('${key}')">Delete</button>`;
+
+            // Update the total distance
+            updateTotalDistance(name, distance);
           }
           alert("Data approved successfully!");
         }).catch(error => {
@@ -575,6 +552,85 @@
       }
     };
 
+    // Function to update total distance for each person
+    function updateTotalDistance(name, distance) {
+      if (totalDistanceMap.has(name)) {
+        totalDistanceMap.set(name, totalDistanceMap.get(name) + distance);
+      } else {
+        totalDistanceMap.set(name, distance);
+      }
+
+      // Check if the person has completed 100 km
+      if (totalDistanceMap.get(name) >= 100 && !winners.includes(name)) {
+        winners.push(name); // Add the winner to the array
+        highlightWinner(name);
+        showCongratulation(name);
+        updateWinnersTable(); // Update the winners table
+      }
+    }
+
+    // Function to update the winners table
+    function updateWinnersTable() {
+      const winnersTable = document.getElementById('winnersTable').getElementsByTagName('tbody')[0];
+      winnersTable.innerHTML = ''; // Clear the table
+
+      winners.forEach((name, index) => {
+        const row = winnersTable.insertRow();
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${name}</td>
+          <td>${getNickname(name)}</td>
+          <td>${getContact(name)}</td>
+          <td>${totalDistanceMap.get(name).toFixed(2)} km</td>
+        `;
+      });
+    }
+
+    // Function to get the nickname of a participant
+    function getNickname(name) {
+      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+      for (let row of rows) {
+        if (row.cells[1].textContent === name) {
+          return row.cells[2].textContent;
+        }
+      }
+      return '';
+    }
+
+    // Function to get the contact of a participant
+    function getContact(name) {
+      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+      for (let row of rows) {
+        if (row.cells[1].textContent === name) {
+          return row.cells[3].textContent;
+        }
+      }
+      return '';
+    }
+
+    // Function to highlight the winner
+    function highlightWinner(name) {
+      const rows = document.getElementById('logTable').getElementsByTagName('tbody')[0].rows;
+      for (let row of rows) {
+        if (row.cells[1].textContent === name) {
+          row.classList.add('winner');
+        }
+      }
+    }
+
+    // Function to show congratulation message with animation
+    function showCongratulation(name) {
+      const congratulationDiv = document.createElement('div');
+      congratulationDiv.className = 'congratulation';
+      congratulationDiv.textContent = `Congratulations ${name}! 🎉`;
+      document.body.appendChild(congratulationDiv);
+
+      // Remove the congratulation message after 3 seconds
+      setTimeout(() => {
+        congratulationDiv.remove();
+      }, 3000);
+    }
+
     // Toggle Winners Table Visibility
     document.getElementById('winnersButton').addEventListener('click', function() {
       const winnersTableContainer = document.getElementById('winnersTableContainer');
@@ -590,6 +646,10 @@
         this.textContent = 'Show Winners';
       }
     });
+
+    // Add event listeners for filtering
+    document.getElementById('nameFilter').addEventListener('change', filterTable);
+    document.getElementById('contactSearch').addEventListener('input', filterTable);
   </script>
 </body>
 </html>
