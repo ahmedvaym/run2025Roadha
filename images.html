@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gallery with Admin Controls</title>
     <style>
         /* Body styling with background image */
@@ -24,14 +24,13 @@
         /* Top section styling */
         .top-section {
             width: 90%;
-            max-width: 1200px;
-            margin-bottom: 20px;
+            margin: 20px 0;
             text-align: center;
         }
 
         /* Filter select styling */
         #filterSelect {
-            width: 300px;
+            width: 100%;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
@@ -43,11 +42,10 @@
         /* Gallery styling */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
             width: 90%;
-            max-width: 1200px;
-            padding: 20px;
+            padding: 10px;
         }
 
         .gallery-item {
@@ -67,13 +65,13 @@
 
         .gallery-item img {
             width: 100%;
-            height: 200px;
+            height: 150px; /* Adjusted for mobile */
             object-fit: cover;
         }
 
         .gallery-item p {
-            padding: 15px;
-            font-size: 1.1rem;
+            padding: 10px;
+            font-size: 0.9rem; /* Smaller font size for mobile */
             color: #555;
             text-align: center;
         }
@@ -81,41 +79,41 @@
         /* Admin button styling */
         .admin-button {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            right: 5px;
             background-color: #ff4d4d;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller font size for mobile */
         }
 
         /* Action buttons styling */
         .action-buttons {
             display: none;
             position: absolute;
-            top: 50px;
-            right: 10px;
+            top: 40px;
+            right: 5px;
             background-color: white;
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px;
+            padding: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .action-buttons button {
             display: block;
             width: 100%;
-            padding: 8px 12px;
+            padding: 6px 10px;
             margin-bottom: 5px;
             background-color: #ff4d4d;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller font size for mobile */
         }
 
         .action-buttons button:hover {
@@ -142,7 +140,7 @@
 
         .modal-content {
             position: relative;
-            max-width: 90%;
+            width: 90%;
             max-height: 90%;
             background-color: #fff;
             border-radius: 10px;
@@ -177,12 +175,12 @@
 
         /* Combined counter styling */
         .image-counter {
-            font-size: 1.2rem;
+            font-size: 1rem; /* Smaller font size for mobile */
             color: #fff;
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
