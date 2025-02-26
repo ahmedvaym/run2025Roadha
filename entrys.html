@@ -89,7 +89,8 @@
 
     input[type="text"],
     input[type="number"],
-    input[type="date"] {
+    input[type="date"],
+    input[type="tel"] {
       padding: 10px; /* Adjusted for mobile */
       font-size: 16px; /* Adjusted for mobile */
       border: 1px solid #ccc;
@@ -124,7 +125,8 @@
 
       input[type="text"],
       input[type="number"],
-      input[type="date"] {
+      input[type="date"],
+      input[type="tel"] {
         font-size: 14px; /* Smaller font for very small screens */
       }
 
@@ -144,7 +146,7 @@
       </div>
       <div class="form-group">
         <label for="contact">Contact:</label>
-        <input type="text" id="contact" placeholder="Enter contact to auto-fill" required>
+        <input type="tel" id="contact" placeholder="Enter contact to auto-fill" required>
       </div>
       <div class="form-group">
         <label for="name">Name:</label>
@@ -219,16 +221,18 @@
       event.preventDefault();
 
       const date = document.getElementById('date').value;
+      const contact = document.getElementById('contact').value;
       const name = document.getElementById('name').value;
       const nickname = document.getElementById('nickname').value;
       const distance = parseFloat(document.getElementById('distance').value); // Parse as float
 
-      if (date && name && nickname && !isNaN(distance)) {
+      if (date && contact && name && nickname && !isNaN(distance)) {
         // Save data to Firebase (using App 2)
         const runningLogRef = database2.ref('runningLogs');
         const newEntry = runningLogRef.push();
         newEntry.set({
           date: new Date(date).toLocaleDateString(), // Only date, no time
+          contact: contact, // Save contact number
           name: name,
           nickname: nickname,
           distance: distance,
