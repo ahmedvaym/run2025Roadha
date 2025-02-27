@@ -183,20 +183,6 @@
       font-weight: bold;
     }
 
-    /* Congratulation Animation */
-   
-
-    .congratulation {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      color: rgb(35, 3, 5);
-      animation: medalAnimation 4s ease-in-out;
-      z-index: 1000;
-    }
-
     /* Winners Button Styles */
     .winners-button-container {
       display: flex;
@@ -604,7 +590,6 @@
       if (totalDistanceMap.get(name) >= 100 && !winners.includes(name)) {
         winners.push(name); // Add the winner to the array
         highlightWinner(name);
-        showCongratulation(name);
         updateWinnersTable(); // Update the winners table
       }
 
@@ -690,18 +675,6 @@
           row.classList.add('winner');
         }
       }
-    }
-
-    // Function to show congratulation message with animation
-    function showCongratulation(name) {
-      const congratulation = document.createElement('div');
-      congratulation.className = 'congratulation';
-      congratulation.textContent = `Congratulations ${name}! 🎉`;
-      document.body.appendChild(congratulation);
-
-      setTimeout(() => {
-        congratulation.remove();
-      }, 4000);
     }
 
     // Toggle Winners Table Visibility
