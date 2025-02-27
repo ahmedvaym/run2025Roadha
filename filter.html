@@ -184,11 +184,7 @@
     }
 
     /* Congratulation Animation */
-    @keyframes medalAnimation {
-      0% { transform: scale(0); opacity: 0; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+   
 
     .congratulation {
       position: fixed;
@@ -624,7 +620,6 @@
       for (let row of rows) {
         if (row.cells[1].textContent === name) {
           row.cells[6].innerHTML = getMedals(name);
-          break;
         }
       }
     }
