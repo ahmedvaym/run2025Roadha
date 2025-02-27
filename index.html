@@ -228,11 +228,12 @@
         }
 
         // Function to save image and text to Firebase
-        function saveDataToFirebase(imageBase64, text) {
+        function saveDataToFirebase(imageBase64, text, contactNumber) {
             const timestamp = new Date().getTime(); // Unique ID for each entry
             database.ref('savedData/' + timestamp).set({
                 image: imageBase64,
                 text: text,
+                contactNumber: contactNumber,
                 timestamp: timestamp
             }).then(() => {
                 console.log('Data saved to Firebase!');
@@ -259,9 +260,15 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const imageBase64 = e.target.result; // Convert image to Base64
-                    const text = prompt('Enter text to save:'); // Prompt for text
-                    if (text) {
-                        saveDataToFirebase(imageBase64, text); // Save image and text to Firebase
+
+                    // Prompt for text and contact number
+                    const text = prompt('Enter image description:');
+                    const contactNumber = prompt('Enter contact number:');
+
+                    if (text && contactNumber) {
+                        saveDataToFirebase(imageBase64, text, contactNumber); // Save image, text, and contact number to Firebase
+                    } else {
+                        alert('Please enter both image description and contact number.');
                     }
                 };
                 reader.readAsDataURL(file); // Read image as Base64
