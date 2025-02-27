@@ -20,25 +20,24 @@
             justify-content: center;
             min-height: 100vh;
         }
-        
 
         /* Top section styling */
         .top-section {
-    position: fixed; /* Fixes the position at the top */
-    top: 0; /* Aligns it to the top of the viewport */
-    left: 0; /* Aligns it to the left of the viewport */
-    width: 100%; /* Ensures it spans the full width of the viewport */
-    background-color: white; /* Optional: Adds a background color to make it stand out */
-    z-index: 1000; /* Ensures it stays on top of other content */
-    padding: 10px; /* Optional: Adds some padding for better spacing */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
-}
+            position: fixed; /* Fixes the position at the top */
+            top: 0; /* Aligns it to the top of the viewport */
+            left: 0; /* Aligns it to the left of the viewport */
+            width: 100%; /* Ensures it spans the full width of the viewport */
+            background-color: white; /* Optional: Adds a background color to make it stand out */
+            z-index: 1000; /* Ensures it stays on top of other content */
+            padding: 10px; /* Optional: Adds some padding for better spacing */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+        }
 
-        /* Filter select styling */
-        #filterSelect {
+        /* Search bar styling */
+        #searchBar {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
@@ -52,6 +51,7 @@
             gap: 10px;
             width: 90%;
             padding: 10px;
+            margin-top: 150px; /* Adjusted to account for the fixed top section */
         }
 
         .gallery-item {
@@ -193,12 +193,9 @@
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
 </head>
 <body>
-    
     <div class="top-section">
         <div class="image-counter" id="imageCounter">Total Images: 0</div>
-        <select id="filterSelect">
-            <option value="">All</option>
-        </select>
+        <input type="text" id="searchBar" placeholder="Search by contact number...">
     </div>
     <div class="gallery" id="gallery"></div>
 
@@ -231,19 +228,17 @@
         database.ref('savedData').on('value', (snapshot) => {
             const savedData = snapshot.val();
             const gallery = document.getElementById('gallery');
-            const filterSelect = document.getElementById('filterSelect');
             const imageCounter = document.getElementById('imageCounter');
             gallery.innerHTML = ''; // Clear previous content
-            filterSelect.innerHTML = '<option value="">All</option>'; // Reset filter options
 
             if (savedData) {
-                const uniqueNames = new Set(); // Use a Set to store unique names
                 let totalCount = 0; // Counter for total images
 
                 Object.keys(savedData).forEach((key) => {
                     const data = savedData[key];
                     const galleryItem = document.createElement('div');
                     galleryItem.classList.add('gallery-item');
+                    galleryItem.dataset.contactNumber = data.contactNumber; // Store contact number in dataset
 
                     // Display image
                     const image = document.createElement('img');
@@ -298,32 +293,22 @@
                     });
 
                     gallery.appendChild(galleryItem);
-
-                    // Add image name to the Set
-                    uniqueNames.add(data.text); // Add the name to the Set
                     totalCount++; // Increment the total image count
                 });
 
                 // Update the image counter
                 imageCounter.textContent = `Total Images: ${totalCount}`;
 
-                // Populate the filter dropdown with unique names
-                uniqueNames.forEach((name) => {
-                    const option = document.createElement('option');
-                    option.value = name; // Use name as the filter value
-                    option.textContent = name;
-                    filterSelect.appendChild(option);
-                });
-
-                // Handle filter selection
-                filterSelect.addEventListener('change', () => {
-                    const selectedValue = filterSelect.value.toLowerCase();
+                // Handle search bar input
+                const searchBar = document.getElementById('searchBar');
+                searchBar.addEventListener('input', () => {
+                    const searchTerm = searchBar.value.trim().toLowerCase();
                     const galleryItems = document.querySelectorAll('.gallery-item');
                     let filteredCount = 0; // Counter for filtered images
 
                     galleryItems.forEach((item) => {
-                        const text = item.querySelector('p').textContent.toLowerCase();
-                        if (selectedValue === "" || text.includes(selectedValue)) {
+                        const contactNumber = item.dataset.contactNumber.toLowerCase();
+                        if (contactNumber.includes(searchTerm)) {
                             item.style.display = 'block';
                             filteredCount++; // Increment counter for filtered images
                         } else {
