@@ -229,6 +229,26 @@
       color: #333;
     }
 
+    /* Topper Section Styles */
+    .topper-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .topper-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+
+    .topper-section p {
+      font-size: 1.2em;
+      margin: 5px 0;
+    }
+
     /* Responsive Styles */
     @media (max-width: 768px) {
       h1 {
@@ -356,6 +376,14 @@
     <div class="total-distance-container">
       <h2>Total Distance</h2>
       <p id="totalDistance">0 km</p>
+    </div>
+
+    <!-- Topper Section -->
+    <div class="topper-section">
+      <h2>Top 3 Participants</h2>
+      <p id="topper1">1. - 0 km</p>
+      <p id="topper2">2. - 0 km</p>
+      <p id="topper3">3. - 0 km</p>
     </div>
 
     <!-- Running Log Section -->
@@ -595,6 +623,9 @@
 
       // Update the medals for the person
       updateMedals(name);
+
+      // Update the top 3 participants
+      updateTop3Participants();
     }
 
     // Function to update the medals for a person
@@ -675,6 +706,16 @@
           row.classList.add('winner');
         }
       }
+    }
+
+    // Function to update the top 3 participants
+    function updateTop3Participants() {
+      const sortedParticipants = Array.from(totalDistanceMap.entries()).sort((a, b) => b[1] - a[1]);
+      const top3 = sortedParticipants.slice(0, 3);
+
+      document.getElementById('topper1').textContent = `1. ${top3[0] ? top3[0][0] : '-'} - ${top3[0] ? top3[0][1].toFixed(2) : '0'} km`;
+      document.getElementById('topper2').textContent = `2. ${top3[1] ? top3[1][0] : '-'} - ${top3[1] ? top3[1][1].toFixed(2) : '0'} km`;
+      document.getElementById('topper3').textContent = `3. ${top3[2] ? top3[2][0] : '-'} - ${top3[2] ? top3[2][1].toFixed(2) : '0'} km`;
     }
 
     // Toggle Winners Table Visibility
